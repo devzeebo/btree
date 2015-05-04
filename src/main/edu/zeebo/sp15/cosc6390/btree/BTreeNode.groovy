@@ -97,16 +97,20 @@ class BTreeNode<K> {
 	}
 
 	def deleteDirect(K key) {
-		if (isLeaf) {
-			pointers.remove ( pointers.find { it.key == key } )
-		}
-		else {
-
-		}
+		pointers.remove ( pointers.find { it.key == key } )
 	}
 
 	def delete(K key) {
+		if (isLeaf) {
+			deleteDirect(key)
+		}
+		else {
+			(pointers[getPointerIndex(key)].value as BTreeNode).delete(key)
+		}
 
+		if (parent != null && count == 0) {
+			parent.deleteDirect( parent.pointers.find { it.value == this }.key )
+		}
 	}
 
 	def snapshot() {

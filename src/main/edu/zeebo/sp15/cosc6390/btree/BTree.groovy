@@ -59,6 +59,15 @@ class BTree<K> extends BTreeNode<K> {
 		super.add key, value
 	}
 
+	def delete(K key) {
+		super.delete key
+
+		if (count == 0) {
+			isLeaf = true
+			size = MAX_ENTRIES
+		}
+	}
+
 	public static void main(String[] args) {
 		BTree<Integer, Integer> tree = new BTree<>()
 
@@ -74,6 +83,20 @@ class BTree<K> extends BTreeNode<K> {
 			if (snapshot[it - 1] != it) {
 				throw new AssertionError("$it out of order")
 			}
+		}
+
+		(0..<10).each { a ->
+			(1..10).each {
+				println "Remove ${a * 10 + it}"
+				tree.delete(a * 10 + it)
+			}
+
+			tree.printTree()
+			println()
+		}
+
+		letters.each {
+			tree.add(it, it * it)
 		}
 
 		println tree.search(Math.random() * 100 + 1 as int)
