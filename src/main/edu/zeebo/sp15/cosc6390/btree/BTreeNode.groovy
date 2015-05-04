@@ -17,7 +17,7 @@ class BTreeNode<K> {
 	boolean isLeaf
 	int size
 
-	def pointers = new LinkedList<BTreeEntry<K, ?>>()
+	def pointers = new LinkedList<BTreeEntry>()
 	// The 11th pointer
 	BTreeNode<K> sibling
 
@@ -25,8 +25,11 @@ class BTreeNode<K> {
 
 	def getCount() { pointers.size() }
 
+	def getSmallestKey() {
+		isLeaf ? pointers[0].key : pointers[0].value.smallestKey
+	}
+
 	def split() {
-		println "Split"
 		// Create sibling node
 		BTreeNode<K> sib = isLeaf ? leaf : node
 
@@ -34,27 +37,45 @@ class BTreeNode<K> {
 		sib.parent = parent
 
 		// Split our pointer set
-		sib.pointers = pointers.subList(size / 2 as int, pointers.size()) as LinkedList
+		sib.pointers = pointers.subList(0, count / 2 as int) as LinkedList
 		// Reassign the parent
 		if (!isLeaf) {
 			sib.pointers*.value*.parent = sib
 		}
-		pointers = pointers.subList(0, size / 2 as int) as LinkedList
+		pointers = pointers.subList(count / 2 as int, count) as LinkedList
 
 		// Reassign the sibling hierarchy
-		sib.sibling = sibling
 		sibling = sib
 
 		// Add sibling to our parent
-		parent.addDirect(new BTreeEntry(sib.pointers[0].key, sib))
+		parent.addDirect(new BTreeEntry(this.smallestKey, sib))
 	}
 
 	def addDirect(BTreeEntry entry) {
 
-		pointers.add(pointers.findLastIndexOf{ it.key < entry.key } + 1, entry)
+		if (entry.key == null) {
+			pointers.add(entry)
+		}
+		else {
+			int idx = pointers.findLastIndexOf { it.key < entry.key } + 1
+			pointers.add(idx, entry)
+
+			// Keep the keys sorted
+			pointers.sort(true)
+
+			// if we assign a new lowest key
+			if (parent != null && idx == 0) {
+				if ((idx = parent.pointers.findIndexOf { it.value == this } - 1) > 0) {
+					parent.pointers[idx].key = pointers[0].key
+				}
+			}
+		}
 
 		if (count > size) {
+//			BTree.instance.printTree()
 			split()
+//			BTree.instance.printTree()
+//			println()
 		}
 	}
 
@@ -64,7 +85,7 @@ class BTreeNode<K> {
 			addDirect(new BTreeEntry(key, value))
 		}
 		else {
-			(pointers[pointers.findLastIndexOf{ it.key <= key }].value as BTreeNode).add(key, value)
+			(pointers[pointers.findIndexOf{ it.key > key }].value as BTreeNode).add(key, value)
 		}
 	}
 
