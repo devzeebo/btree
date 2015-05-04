@@ -38,7 +38,7 @@ class BTreeNode<K> {
 
 		// Add ourselves to our parent
 		parent.pointers << new BTreeEntry<K, Object>(pointers[0].key, this)
-		parent.pointers << new BTreeEntry<K, Object>(sib.pointers[0].key, this)git
+		parent.pointers << new BTreeEntry<K, Object>(sib.pointers[0].key, this)
 
 		return parent
 	}
