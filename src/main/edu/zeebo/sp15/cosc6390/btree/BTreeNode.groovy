@@ -72,10 +72,7 @@ class BTreeNode<K> {
 		}
 
 		if (count > size) {
-//			BTree.instance.printTree()
 			split()
-//			BTree.instance.printTree()
-//			println()
 		}
 	}
 
@@ -87,6 +84,10 @@ class BTreeNode<K> {
 		else {
 			(pointers[pointers.findIndexOf{ it.key > key }].value as BTreeNode).add(key, value)
 		}
+	}
+
+	def search(K key) {
+		isLeaf ? pointers.find { it.key == key } : pointers[pointers.findIndexOf { it.key > key }].value.search(key)
 	}
 
 	def printTree(int indent = 0) {

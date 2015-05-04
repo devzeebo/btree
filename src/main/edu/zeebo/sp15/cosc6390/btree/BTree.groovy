@@ -48,21 +48,24 @@ class BTree<K> extends BTreeNode<K> {
 		}
 	}
 
-	def search(K key) {
-
+	def add(K key, value) {
+		if (search(key)) {
+			throw new IllegalStateException("$key is already in the tree")
+		}
+		super.add key, value
 	}
 
 	public static void main(String[] args) {
-		BTree<String, String> tree = new BTree<>()
+		BTree<Integer, Integer> tree = new BTree<>()
 
 		def letters = (1..100).toList()
 		letters.sort { Math.random() }.each {
 			println "Adding $it"
-			tree.add(it, it)
-//			tree.printTree()
-//			println()
+			tree.add(it, it * it)
 		}
 
 		tree.printTree()
+
+		println tree.search(Math.random() * 100 + 1 as int)
 	}
 }
