@@ -19,7 +19,8 @@ class BTreeNode<K> {
 
 	def pointers = new LinkedList<BTreeEntry>()
 	// The 11th pointer
-	BTreeNode<K> sibling
+	BTreeNode<K> leftSibling
+	BTreeNode<K> rightSibling
 
 	BTreeNode parent
 
@@ -27,6 +28,10 @@ class BTreeNode<K> {
 
 	def getSmallestKey() {
 		isLeaf ? pointers[0].key : pointers[0].value.smallestKey
+	}
+
+	def getPointerIndex(K key) {
+		pointers.findIndexOf { it.key == null || it.key > key }
 	}
 
 	def split() {
@@ -38,14 +43,18 @@ class BTreeNode<K> {
 
 		// Split our pointer set
 		sib.pointers = pointers.subList(0, count / 2 as int) as LinkedList
-		// Reassign the parent
+		// Reassign the parent and clear the last key
 		if (!isLeaf) {
 			sib.pointers*.value*.parent = sib
+			sib.pointers[-1].key = null
 		}
 		pointers = pointers.subList(count / 2 as int, count) as LinkedList
 
 		// Reassign the sibling hierarchy
-		sibling = sib
+		leftSibling?.rightSibling = sib
+		sib.leftSibling = leftSibling
+		sib.rightSibling = this
+		leftSibling = sib
 
 		// Add sibling to our parent
 		parent.addDirect(new BTreeEntry(this.smallestKey, sib))
@@ -57,16 +66,13 @@ class BTreeNode<K> {
 			pointers.add(entry)
 		}
 		else {
-			int idx = pointers.findLastIndexOf { it.key < entry.key } + 1
-			pointers.add(idx, entry)
-
-			// Keep the keys sorted
-			pointers.sort(true)
+			int idx = getPointerIndex(entry.key)
+			idx >= 0 ? pointers.add(idx, entry) : pointers << entry
 
 			// if we assign a new lowest key
 			if (parent != null && idx == 0) {
 				if ((idx = parent.pointers.findIndexOf { it.value == this } - 1) > 0) {
-					parent.pointers[idx].key = pointers[0].key
+					parent.pointers[idx].key = this.smallestKey
 				}
 			}
 		}
@@ -82,12 +88,41 @@ class BTreeNode<K> {
 			addDirect(new BTreeEntry(key, value))
 		}
 		else {
-			(pointers[pointers.findIndexOf{ it.key > key }].value as BTreeNode).add(key, value)
+			(pointers[getPointerIndex(key)].value as BTreeNode).add(key, value)
 		}
 	}
 
 	def search(K key) {
-		isLeaf ? pointers.find { it.key == key } : pointers[pointers.findIndexOf { it.key > key }].value.search(key)
+		isLeaf ? pointers.find { it.key == key } : pointers[getPointerIndex(key)].value.search(key)
+	}
+
+	def deleteDirect(K key) {
+		if (isLeaf) {
+			pointers.remove ( pointers.find { it.key == key } )
+		}
+		else {
+
+		}
+	}
+
+	def delete(K key) {
+
+	}
+
+	def snapshot() {
+		if (isLeaf) {
+			def elements = []
+			BTreeNode node = this
+
+			while (node != null) {
+				elements << node.pointers*.key
+				node = node.rightSibling
+			}
+			return elements.flatten()
+		}
+		else {
+			pointers[0].value.snapshot()
+		}
 	}
 
 	def printTree(int indent = 0) {

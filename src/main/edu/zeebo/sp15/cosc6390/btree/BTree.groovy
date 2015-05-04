@@ -30,8 +30,12 @@ class BTree<K> extends BTreeNode<K> {
 		if (!left.isLeaf) {
 			left.pointers[-1].key = null
 		}
+		else {
+			left.rightSibling = right
+			right.leftSibling = left
+		}
 
-		// reassign the parent node if not leafs
+		// reassign the parent node if not leaves
 		if (!isLeaf) {
 			[left, right].each { node -> node.pointers*.value*.parent = node }
 		}
@@ -64,7 +68,13 @@ class BTree<K> extends BTreeNode<K> {
 			tree.add(it, it * it)
 		}
 
-		tree.printTree()
+		def snapshot = tree.snapshot()
+		println snapshot
+		(1..100).each {
+			if (snapshot[it - 1] != it) {
+				throw new AssertionError("$it out of order")
+			}
+		}
 
 		println tree.search(Math.random() * 100 + 1 as int)
 	}
