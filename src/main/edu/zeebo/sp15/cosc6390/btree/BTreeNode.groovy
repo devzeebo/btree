@@ -177,7 +177,7 @@ class BTreeNode<K> {
 		}
 	}
 
-	def snapshot() {
+	def list() {
 		if (leafNode) {
 			def elements = []
 			BTreeNode node = this
@@ -189,16 +189,19 @@ class BTreeNode<K> {
 			return elements.flatten()
 		}
 		else {
-			pointers[0].value.snapshot()
+			pointers[0].value.list()
 		}
 	}
 
 	def printTree(int indent = 0) {
-		def k = parent?.pointers?.find { it.value == this }?.key
-		if (k) {
-			print "$k${' ' * (indent * 4 - "$k".length())}"
+
+		print '\t' * indent
+		if (count > 0) {
+			println "[${pointers[0]?.key}, ${pointers[-1]?.key}]"
 		}
-		println pointers*.key.join(',')
+		else {
+			println "No Keys"
+		}
 
 		if (!bucketNode) {
 			pointers*.value*.printTree(indent + 1)

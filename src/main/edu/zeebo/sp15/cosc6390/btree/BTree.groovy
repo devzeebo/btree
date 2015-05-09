@@ -95,7 +95,7 @@ class BTree<K, V> extends BTreeNode<K> {
 						break
 					case 'd': tree.delete c[1] as int
 						break
-					case 'snapshot': println tree.size
+					case 'list': println tree.size
 						break
 				}
 				tree.printTree()
