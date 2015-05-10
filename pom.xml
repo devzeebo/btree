@@ -6,7 +6,7 @@
 
 	<groupId>edu.zeebo.sp15.cosc6390</groupId>
 	<artifactId>btree</artifactId>
-	<version>0.1</version>
+	<version>1.0</version>
 
 	<dependencies>
 		<dependency>
@@ -64,20 +64,6 @@
 						<version>2.7.0-01</version>
 					</dependency>
 				</dependencies>
-			</plugin>
-			<plugin>
-				<groupId>com.googlecode.mavennatives</groupId>
-				<artifactId>maven-nativedependencies-plugin</artifactId>
-				<version>0.0.5</version>
-				<executions>
-					<execution>
-						<id>unpacknatives</id>
-						<phase>generate-resources</phase>
-						<goals>
-							<goal>copy</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 		</plugins>
 	</build>

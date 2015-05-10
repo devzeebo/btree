@@ -24,7 +24,7 @@ class Driver {
 
 //			println '\n\n\n'
 //			println tree.printTree()
-			println command
+//			println command
 
 			if (command[0] == '*') {
 				mode = Mode.valueOf command.substring(1).toUpperCase()
@@ -53,9 +53,9 @@ class Driver {
 						case Mode.SEARCH:
 							def value
 							if ((value = tree.search(command))) {
-								println value.value
+								println "$command: ${value.value}"
 							} else {
-								println "Key not found: $command"
+								println "Error: $command is not in the tree"
 							}
 							break
 						case Mode.UPDATE:
@@ -65,7 +65,7 @@ class Driver {
 									value.value = originalCommand
 								}
 								else {
-									println "Error: $updateKey not in tree"
+									println "Error: $updateKey is not in the tree"
 								}
 							} else {
 								updateKey = command
