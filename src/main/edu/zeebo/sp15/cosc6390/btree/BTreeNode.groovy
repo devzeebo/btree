@@ -59,7 +59,7 @@ class BTreeNode<K> {
 	}
 
 	def getPointerIndex(K key) {
-		pointers.findIndexOf { it.key == null || it.key >= key }
+		pointers.findIndexOf { it.key == null || it.key > key }
 	}
 
 	def split() {
@@ -80,7 +80,6 @@ class BTreeNode<K> {
 				sib.pointers[-1].key = null
 			}
 		} else {
-			println "Changing ${pointers*.key.join(',')} to $smallestKey"
 			parent.pointers.find { it.value == this }.key = smallestKey
 		}
 
@@ -89,8 +88,6 @@ class BTreeNode<K> {
 		sib.leftSibling = leftSibling
 		sib.rightSibling = this
 		leftSibling = sib
-
-		println "Adding ${bucketNode ? sib.smallestKey : this.smallestKey} : ${sib.pointers*.key.join(',')}"
 
 		// Add sibling to our parent
 		parent.addDirect(new BTreeEntry(bucketNode ? sib.smallestKey : this.smallestKey, sib))
@@ -119,18 +116,23 @@ class BTreeNode<K> {
 	}
 
 	def add(K key, value) {
-
 		if (bucketNode) {
 			addDirect(new BTreeEntry(key, value))
 		}
 		else {
-			int idx = pointers.findLastIndexOf { it.key < key }
+			int idx
+
 			if (leafNode) {
+				idx = pointers.findLastIndexOf { it.key < key }
+				// Possibly insert a new bucket
 				if (idx == -1) {
 					pointers.add 0, new BTreeEntry(key, bucket)
 					pointers[0].value.parent = this
 					idx = 0
 				}
+			}
+			else {
+				idx = pointers.findIndexOf { it.key >= key }
 			}
 
 			(pointers[idx].value as BTreeNode).add key, value
@@ -138,7 +140,12 @@ class BTreeNode<K> {
 	}
 
 	def search(K key) {
-		bucketNode ? pointers.find { it.key == key }?.value : pointers[getPointerIndex(key)].value.search(key)
+		// bucket
+		bucketNode ? pointers.find { it.key == key }?.value :
+				// leaf
+				leafNode ? pointers[pointers.findLastIndexOf { it.key <= key }].value.search(key) :
+						// internal
+						pointers[getPointerIndex(key)].value.search(key)
 	}
 
 	def deleteDirect(K key) {
@@ -147,6 +154,10 @@ class BTreeNode<K> {
 		// Delete the block element
 		if (bucketNode) {
 			pointers[idx].value.delete()
+		} else {
+			BTreeNode node = pointers[idx].value
+			node.leftSibling?.rightSibling = node.rightSibling
+			node.rightSibling?.leftSibling = node.leftSibling
 		}
 
 		// Actually remove the pointer
@@ -183,7 +194,9 @@ class BTreeNode<K> {
 			BTreeNode node = this
 
 			while (node != null) {
-				elements << node.pointers*.key
+				node.pointers.each {
+					elements << it.value.pointers*.key
+				}
 				node = node.rightSibling
 			}
 			return elements.flatten()
@@ -193,18 +206,40 @@ class BTreeNode<K> {
 		}
 	}
 
+	def getPointersString(int indent = 0) {
+
+		String output = ""
+		output +=  '\t' * indent
+		if (count > 0) {
+			output += "[${pointers[0]?.key}, ${pointers.reverse(false).find { it.key != null }?.key}]"
+		}
+		output += '\n'
+
+		if (!leafNode) {
+			output += pointers*.value*.getPointersString(indent + 1).join()
+		}
+		return output
+	}
+
 	def printTree(int indent = 0) {
 
-		print '\t' * indent
+		String output = ""
+		output +=  '\t' * indent
 		if (count > 0) {
-			println "[${pointers[0]?.key}, ${pointers[-1]?.key}]"
+			output += pointers.collect { "${it.key}(${it.value.hashCode()})" }.join(' ')
 		}
-		else {
-			println "No Keys"
-		}
+		output += '\n'
 
 		if (!bucketNode) {
-			pointers*.value*.printTree(indent + 1)
+			output += pointers*.value*.printTree(indent + 1).join()
 		}
+		return output
+	}
+
+	def getDepth() {
+		if (bucketNode) {
+			return 0
+		}
+		return 1 + pointers*.value*.depth.max()
 	}
 }

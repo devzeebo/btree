@@ -24,12 +24,18 @@ class BlockManager<V> {
 		def putAt(int idx, V value) { elements[idx].value = value }
 
 		class BlockElement<V> {
-			V value
+			static def EMPTY = new Object()
+
+			V value = EMPTY
 			Block<V> block
+
+			V getValue() {
+				value == EMPTY ? null : value
+			}
 
 			def delete() {
 				value = null
-				if (block.elements.count { it.value != null } == 0) {
+				if (block.elements.count { it.value != EMPTY } == 0) {
 					block.manager.blocks.remove block
 				}
 			}

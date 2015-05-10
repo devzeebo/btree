@@ -32,7 +32,7 @@ class BTree<K, V> extends BTreeNode<K> {
 		right.pointers = pointers.subList(count / 2 as int, count) as LinkedList
 
 		// clear the rightmost left key
-		if (!left.bucketNode) {
+		if (left.internalNode) {
 			left.pointers[-1].key = null
 		}
 		else {
@@ -59,7 +59,7 @@ class BTree<K, V> extends BTreeNode<K> {
 	def add(K key, V value) {
 
 		if (count > 0 && search(key)) {
-			throw new IllegalStateException("$key is already in the tree")
+			throw new IllegalArgumentException("$key is already in the tree")
 		}
 
 		BlockElement<V> element = manager.element
@@ -69,38 +69,15 @@ class BTree<K, V> extends BTreeNode<K> {
 	}
 
 	def delete(K key) {
+
+		if (count > 0 && !search(key)) {
+			throw new IllegalArgumentException("$key is not in the tree")
+		}
+
 		super.delete key
 
 		if (count == 0) {
 			getLeaf(this)
-		}
-	}
-
-	public static void main(String[] args) {
-		BTree tree = new BTree()
-
-		Scanner scan = new Scanner(System.in)
-
-		while(true) {
-			String[] c = scan.nextLine().split(' ')
-
-			try {
-				tree.printTree()
-				switch (c[0]) {
-					case 'q': System.exit(0)
-						break
-					case 'a': tree.add c[1] as int, c[1] as int
-						break
-					case 's': println tree.search(c[1] as int)
-						break
-					case 'd': tree.delete c[1] as int
-						break
-					case 'list': println tree.size
-						break
-				}
-				tree.printTree()
-			}
-			catch (Exception e) { e.printStackTrace() }
 		}
 	}
 }

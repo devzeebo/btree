@@ -15,10 +15,10 @@ class BTreeEntry<K, V> implements Comparable<BTreeEntry>{
 
 	int compareTo(BTreeEntry other) {
 		if (!key) {
-			return 1
+			return Integer.MAX_VALUE
 		}
 		if (!other.key) {
-			return -1
+			return Integer.MIN_VALUE
 		}
 		return key <=> other.key
 	}
