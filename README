@@ -1,0 +1,23 @@
+Eric Siebeneich - 0867753
+
+I used Groovy to develop my B+ Tree. The project deploys via Maven and requires Maven > 3.2.5 and Java 1.7. You do not need to install Groovy, Maven will download it for you.
+
+INSTRUCTIONS
+
+1. Make sure you have Java 1.7 installed (untested with Java 1.8), and JAVA_HOME is set properly
+2. Make sure you have Maven installed (Version > 3.2.5 should work) and M2_HOME set properly
+3. Clone the Git repo into hw2_0867753
+
+git clone https://github.com/zeebo404/btree.git hw2_0867753
+
+4. Change into the directory
+
+cd hw2_0867753
+
+5. Compile the project
+
+mvn compile
+
+6. Execute the program. Program reads from standard in. You can pipe any input files in that way. Your input file should end with a blank line.
+
+mvn exec:java -Dexec.mainClass=edu.zeebo.sp15.cosc6340.btree.Driver -Dexec.args="-f <inputFilename>"

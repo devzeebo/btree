@@ -1,4 +1,4 @@
-package edu.zeebo.sp15.cosc6390.btree
+package edu.zeebo.sp15.cosc6340.btree
 
 /**
  * User: Eric
@@ -240,6 +240,6 @@ class BTreeNode<K> {
 		if (bucketNode) {
 			return 0
 		}
-		return 1 + pointers*.value*.depth.max()
+		return 1 + (pointers*.value*.depth.max() as int)
 	}
 }

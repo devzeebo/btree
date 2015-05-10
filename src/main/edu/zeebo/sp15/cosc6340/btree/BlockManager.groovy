@@ -1,4 +1,4 @@
-package edu.zeebo.sp15.cosc6390.btree
+package edu.zeebo.sp15.cosc6340.btree
 
 /**
  * User: Eric
@@ -44,7 +44,7 @@ class BlockManager<V> {
 
 	def blocks = []
 
-	Block.BlockElement<V> getElement() {
+	Block.BlockElement getElement() {
 		// add a new block if this one is full
 		if (blocks.size() == 0 || blocks[-1].count == 4) {
 			blocks << new Block<V>(this)

@@ -1,7 +1,4 @@
-package edu.zeebo.sp15.cosc6390.btree
-
-import edu.zeebo.sp15.cosc6390.btree.BlockManager.Block.BlockElement
-
+package edu.zeebo.sp15.cosc6340.btree
 /**
  * User: Eric
  * Date: 4/30/2015
@@ -62,7 +59,7 @@ class BTree<K, V> extends BTreeNode<K> {
 			throw new IllegalArgumentException("$key is already in the tree")
 		}
 
-		BlockElement<V> element = manager.element
+		BlockManager.Block.BlockElement<V> element = manager.element
 		element.value = value
 
 		super.add key, element
