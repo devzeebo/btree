@@ -82,11 +82,13 @@ class Driver {
 			}
 
 //			println tree.list()
-			def checker = ''
-			tree.list().each { String it ->
-				assert checker < it
-				checker = it
-			}
+
+			// assertion to ensure ordering is correct after every step
+//			def checker = ''
+//			tree.list().each { String it ->
+//				assert checker < it
+//				checker = it
+//			}
 
 //			println tree.printTree()
 		}
