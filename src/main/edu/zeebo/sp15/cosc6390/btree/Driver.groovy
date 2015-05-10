@@ -78,7 +78,6 @@ class Driver {
 				}
 				catch (Exception e) {
 					println "Error: $e.message"
-					e.printStackTrace()
 				}
 			}
 
